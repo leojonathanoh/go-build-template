@@ -31,7 +31,8 @@ VERSION := $(shell git describe --tags --always --dirty)
 ### These variables should not need tweaking.
 ###
 
-SRC_DIRS := cmd pkg # directories which hold app source (not vendored)
+#SRC_DIRS := cmd pkg # directories which hold app source (not vendored)
+SRC_DIRS := . # directories which hold app source (not vendored)
 
 ALL_PLATFORMS := linux/amd64 linux/arm linux/arm64 linux/ppc64le linux/s390x
 
@@ -45,6 +46,7 @@ IMAGE := $(REGISTRY)/$(BIN)
 TAG := $(VERSION)__$(OS)_$(ARCH)
 
 BUILD_IMAGE ?= golang:1.12
+TEST_IMAGE ?= golang:1.12-alpine
 
 PWD = $$(pwd)
 
@@ -168,7 +170,7 @@ shell: $(BUILD_DIRS)
 	    -ti                                                     \
 	    --rm                                                    \
 	    -u $$(id -u):$$(id -g)                                  \
-	    -v ${PWD}:/src                                         \
+	    -v ${PWD}:/src                                          \
 	    -w /src                                                 \
 	    -v ${PWD}/.go:/go										\
 	    -v ${PWD}/.go/.cache:/.cache							\
@@ -219,14 +221,13 @@ test: $(BUILD_DIRS)
 	    -i                                                      \
 	    --rm                                                    \
 	    -u $$(id -u):$$(id -g)                                  \
-	    -v ${PWD}:/src                                         \
+	    -v ${PWD}:/src                                          \
 	    -w /src                                                 \
-	    -v ${PWD}/.go/bin/$(OS)_$(ARCH):/go/bin                \
-	    -v ${PWD}/.go/bin/$(OS)_$(ARCH):/go/bin/$(OS)_$(ARCH)  \
-	    -v ${PWD}/.go/cache:/.cache                            \
+	    -v ${PWD}/.go:/go										\
+	    -v ${PWD}/.go/.cache:/.cache                            \
 	    --env HTTP_PROXY=$(HTTP_PROXY)                          \
 	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
-	    $(BUILD_IMAGE)                                          \
+	    $(TEST_IMAGE)                                          \
 	    /bin/sh -c "                                            \
 	        ARCH=$(ARCH)                                        \
 	        OS=$(OS)                                            \
