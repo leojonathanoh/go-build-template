@@ -128,12 +128,13 @@ build: $(OUTBIN)
 # The following structure defeats Go's (intentional) behavior to always touch
 # result files, even if they have not changed.  This will still run `go` but
 # will not trigger further work if nothing has actually changed.
-$(OUTBIN): .go/$(OUTBIN).stamp
-	@true
+# $(OUTBIN): .go/$(OUTBIN).stamp
+# 	@true
 
 # This will build the binary under ./.go and update the real binary iff needed.
-.PHONY: .go/$(OUTBIN).stamp
-.go/$(OUTBIN).stamp: $(BUILD_DIRS)
+#.PHONY: .go/$(OUTBIN).stamp
+#.go/$(OUTBIN).stamp: $(BUILD_DIRS)
+$(OUTBIN): $(BUILD_DIRS)
 	@echo "making $(OUTBIN)"
 	@docker run                                                 \
 	    -i                                                      \
@@ -235,7 +236,7 @@ test: $(BUILD_DIRS)
 
 # Development docker-compose up. Run build first
 up:
-	@make build
+	@$(MAKE) build
 	@docker-compose -f docker-compose.dev.yml up
 
 # Development docker-compose down
@@ -250,6 +251,3 @@ container-clean:
 
 bin-clean:
 	rm -rf .go bin
-
-# Create directories
-$(shell mkdir -p $(BUILD_DIRS) $(BUILD_BIN_DIR) $(BUILD_SRC_DIR) )
