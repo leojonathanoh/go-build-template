@@ -14,10 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -o errexit
-set -o nounset
-set -o pipefail
-
+if [ -z "${OUTBIN:-}" ]; then
+    echo "OUTBIN must be set"
+    exit 1
+fi
 if [ -z "${OS:-}" ]; then
     echo "OS must be set"
     exit 1
@@ -35,9 +35,7 @@ export CGO_ENABLED=0
 export GOARCH="${ARCH}"
 export GOOS="${OS}"
 export GO111MODULE=on
-export GOFLAGS="-mod=vendor"
+#export GOFLAGS="-mod=vendor"
 
-go install                                                      \
-    -installsuffix "static"                                     \
-    -ldflags "-X $(go list -m)/pkg/version.VERSION=${VERSION}"  \
-    ./...
+go build -o "$OUTBIN" -ldflags "-s -w -extldflags \"-static\" -X main.VERSION=$VERSION -X main.COMMIT_SHA1=$COMMIT_SHA1 -X main.BUILD_DATE=$BUILD_DATE"
+

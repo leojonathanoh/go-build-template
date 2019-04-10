@@ -14,12 +14,15 @@
 
 # The binary to build (just the basename).
 BIN := myapp
+GOOS = linux
+GOARCH = amd64
 
 # Where to push the docker image.
 REGISTRY ?= thockin
 
 # This version-strategy uses git tags to set the version string
 VERSION := $(shell git describe --tags --always --dirty)
+
 #
 # This version-strategy uses a manual value to set the version string
 #VERSION := 1.2.3
@@ -41,7 +44,25 @@ BASEIMAGE ?= gcr.io/distroless/static
 IMAGE := $(REGISTRY)/$(BIN)
 TAG := $(VERSION)__$(OS)_$(ARCH)
 
-BUILD_IMAGE ?= golang:1.12-alpine
+BUILD_IMAGE ?= golang:1.12
+
+PWD = $$(pwd)
+
+# Directory to mount ramdisk on
+BUILD_BIN_DIR := ${PWD}/bin
+
+# $GOPATH/src to download dependencies into
+# BUILD_SRC_DIR := .go/src
+
+# Directories that we need created to build/test.
+BUILD_DIRS := ${PWD}/.go/pkg				\
+              ${PWD}/.go/.cache				\
+			  ${PWD}/bin/$(OS)_$(ARCH)      \
+              #.go/bin/$(OS)_$(ARCH)
+$(BUILD_DIRS):
+	@mkdir -p $@
+
+OUTBIN = bin/$(OS)_$(ARCH)/$(BIN)
 
 # If you want to build all binaries, see the 'all-build' rule.
 # If you want to build all containers, see the 'all-container' rule.
@@ -75,17 +96,38 @@ all-container: $(addprefix container-, $(subst /,_, $(ALL_PLATFORMS)))
 
 all-push: $(addprefix push-, $(subst /,_, $(ALL_PLATFORMS)))
 
-build: bin/$(OS)_$(ARCH)/$(BIN)
+# Mounts a ramdisk on ./go/bin
+mount-ramdisk:
+	@mkdir -p $(BUILD_BIN_DIR)
+	@mount | grep $(BUILD_BIN_DIR) && echo "tmpfs already mounted on $(BUILD_BIN_DIR)" || ( sudo mount -t tmpfs -o size=128M tmpfs $(BUILD_BIN_DIR) && mount | grep $(BUILD_BIN_DIR) && echo "tmpfs mounted on $(BUILD_BIN_DIR)" )
 
-# Directories that we need created to build/test.
-BUILD_DIRS := bin/$(OS)_$(ARCH)     \
-              .go/bin/$(OS)_$(ARCH) \
-              .go/cache
+# Unmounts a ramdisk on ./go/bin
+unmount-ramdisk:
+	@mount | grep $(BUILD_BIN_DIR) && sudo umount $(BUILD_BIN_DIR) && echo "unmount $(BUILD_BIN_DIR)" || echo "nothing to unmount on $(BUILD_BIN_DIR)"
+
+# Deprecated: This will download dependencies ./.go/src
+# get: $(BUILD_SRC_DIR)
+# 	@mkdir -p $(BUILD_SRC_DIR)
+# 	@echo "running go get"
+# 	@docker run                                                 \
+# 	    -i                                                      \
+# 	    --rm                                                    \
+# 	    -u $$(id -u):$$(id -g)                                  \
+# 	    -v ${PWD}/.go/src:/go/src               				\
+# 	    -v ${PWD}:/go/src/app                                   \
+# 	    -w /go/src/app                                          \
+# 	    --env HTTP_PROXY=$(HTTP_PROXY)                          \
+# 	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
+# 	    $(BUILD_IMAGE)                                          \
+# 	    /bin/sh -c "                                            \
+# 			go get -d -v ./...                                  \
+# 	    "
+
+build: $(OUTBIN)
 
 # The following structure defeats Go's (intentional) behavior to always touch
 # result files, even if they have not changed.  This will still run `go` but
 # will not trigger further work if nothing has actually changed.
-OUTBIN = bin/$(OS)_$(ARCH)/$(BIN)
 $(OUTBIN): .go/$(OUTBIN).stamp
 	@true
 
@@ -97,21 +139,23 @@ $(OUTBIN): .go/$(OUTBIN).stamp
 	    -i                                                      \
 	    --rm                                                    \
 	    -u $$(id -u):$$(id -g)                                  \
-	    -v $$(pwd):/src                                         \
+	    -v ${PWD}:/src                                          \
 	    -w /src                                                 \
-	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin                \
-	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin/$(OS)_$(ARCH)  \
-	    -v $$(pwd)/.go/cache:/.cache                            \
+	    -v ${PWD}/.go:/go										\
+	    -v ${PWD}/.go/.cache:/.cache							\
 	    --env HTTP_PROXY=$(HTTP_PROXY)                          \
 	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
 	    $(BUILD_IMAGE)                                          \
 	    /bin/sh -c "                                            \
+			OUTBIN=$(OUTBIN)									\
 	        ARCH=$(ARCH)                                        \
 	        OS=$(OS)                                            \
 	        VERSION=$(VERSION)                                  \
+	        COMMIT_SHA1=$(shell git rev-parse HEAD)             \
+			BUILD_DATE=$(shell date '+%Y-%m-%dT%H:%M:%S%z')		\
 	        ./build/build.sh                                    \
-	    "
-	@if ! cmp -s .go/$(OUTBIN) $(OUTBIN); then \
+	    ";
+#	@if ! cmp -s .go/$(OUTBIN) $(OUTBIN); then \
 	    mv .go/$(OUTBIN) $(OUTBIN);            \
 	    date >$@;                              \
 	fi
@@ -123,11 +167,10 @@ shell: $(BUILD_DIRS)
 	    -ti                                                     \
 	    --rm                                                    \
 	    -u $$(id -u):$$(id -g)                                  \
-	    -v $$(pwd):/src                                         \
+	    -v ${PWD}:/src                                         \
 	    -w /src                                                 \
-	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin                \
-	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin/$(OS)_$(ARCH)  \
-	    -v $$(pwd)/.go/cache:/.cache                            \
+	    -v ${PWD}/.go:/go										\
+	    -v ${PWD}/.go/.cache:/.cache							\
 	    --env HTTP_PROXY=$(HTTP_PROXY)                          \
 	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
 	    $(BUILD_IMAGE)                                          \
@@ -175,11 +218,11 @@ test: $(BUILD_DIRS)
 	    -i                                                      \
 	    --rm                                                    \
 	    -u $$(id -u):$$(id -g)                                  \
-	    -v $$(pwd):/src                                         \
+	    -v ${PWD}:/src                                         \
 	    -w /src                                                 \
-	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin                \
-	    -v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin/$(OS)_$(ARCH)  \
-	    -v $$(pwd)/.go/cache:/.cache                            \
+	    -v ${PWD}/.go/bin/$(OS)_$(ARCH):/go/bin                \
+	    -v ${PWD}/.go/bin/$(OS)_$(ARCH):/go/bin/$(OS)_$(ARCH)  \
+	    -v ${PWD}/.go/cache:/.cache                            \
 	    --env HTTP_PROXY=$(HTTP_PROXY)                          \
 	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
 	    $(BUILD_IMAGE)                                          \
@@ -190,8 +233,15 @@ test: $(BUILD_DIRS)
 	        ./build/test.sh $(SRC_DIRS)                         \
 	    "
 
-$(BUILD_DIRS):
-	@mkdir -p $@
+# Development docker-compose up. Run build first
+up:
+	@make build
+	@docker-compose -f docker-compose.dev.yml up
+
+# Development docker-compose down
+down:
+	@docker-compose -f docker-compose.dev.yml down
+
 
 clean: container-clean bin-clean
 
@@ -200,3 +250,6 @@ container-clean:
 
 bin-clean:
 	rm -rf .go bin
+
+# Create directories
+$(shell mkdir -p $(BUILD_DIRS) $(BUILD_BIN_DIR) $(BUILD_SRC_DIR) )
