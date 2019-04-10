@@ -1,5 +1,5 @@
 # Go app template build environment
-[![Build Status](https://travis-ci.org/thockin/go-build-template.svg?branch=master)](https://travis-ci.org/thockin/go-build-template) 
+[![Build Status](https://travis-ci.org/leojonathanoh/go-build-template.svg?branch=master)](https://travis-ci.org/thockin/go-build-template)
 
 This is a skeleton project for a Go application, which captures the best build
 techniques I have learned to date.  It uses a Makefile to drive the build (the
@@ -13,6 +13,7 @@ To use this, simply copy these files and make the following changes:
 
 Makefile:
    - change `BIN` to your binary name
+   - change `GOOS` and `GOARCH` accordingly
    - rename `cmd/myapp` to `cmd/$BIN`
    - change `REGISTRY` to the Docker registry you want to use
    - maybe change `SRC_DIRS` if you use some other layout
@@ -44,3 +45,9 @@ Run `make push` to push the container image to `REGISTRY`.  Run `make all-push`
 to push the container images for all architectures.
 
 Run `make clean` to clean up.
+
+## Start / stop the application
+
+Run `make up` to start the dockerized application
+
+Run `make down` to stop the dockerized application
