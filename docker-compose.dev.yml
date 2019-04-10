@@ -1,0 +1,15 @@
+version: '2.0'
+
+services:
+  myapp:
+    image: alpine:3.8
+    entrypoint: /myapp
+    volumes:
+      - ./bin/linux_amd64/myapp:/myapp
+    ports:
+      - 8080:8080
+    networks:
+      - net
+
+networks:
+  net:
