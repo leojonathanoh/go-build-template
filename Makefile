@@ -250,7 +250,7 @@ up: $(DEV_DOCKER_COMPOSE_YML)
 
 # Development docker-compose down
 down: $(DEV_DOCKER_COMPOSE_YML)
-	@@UID=$$(id -u) GID=$$(id -g) docker-compose -f docker-compose.dev.yml down
+	@UID=$$(id -u) GID=$$(id -g) docker-compose -f docker-compose.dev.yml down
 
 
 clean: container-clean bin-clean
