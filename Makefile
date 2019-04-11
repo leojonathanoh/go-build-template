@@ -58,7 +58,7 @@ BUILD_BIN_DIR := ${PWD}/bin
 
 # Directories that we need created to build/test.
 BUILD_DIRS := ${PWD}/.go/pkg				\
-              ${PWD}/.go/.cache				\
+              ${PWD}/.cache				    \
 			  ${PWD}/bin/$(OS)_$(ARCH)      \
               #.go/bin/$(OS)_$(ARCH)
 $(BUILD_DIRS):
@@ -147,7 +147,7 @@ $(OUTBIN): $(BUILD_DIRS)
 	    -v ${PWD}:/src                                          \
 	    -w /src                                                 \
 	    -v ${PWD}/.go:/go										\
-	    -v ${PWD}/.go/.cache:/.cache							\
+	    -v ${PWD}/.cache:/.cache						    	\
 	    --env HTTP_PROXY=$(HTTP_PROXY)                          \
 	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
 	    $(BUILD_IMAGE)                                          \
@@ -175,7 +175,7 @@ shell: $(BUILD_DIRS)
 	    -v ${PWD}:/src                                          \
 	    -w /src                                                 \
 	    -v ${PWD}/.go:/go										\
-	    -v ${PWD}/.go/.cache:/.cache							\
+	    -v ${PWD}/.cache:/.cache						    	\
 	    --env HTTP_PROXY=$(HTTP_PROXY)                          \
 	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
 	    $(BUILD_IMAGE)                                          \
@@ -226,10 +226,10 @@ test: $(BUILD_DIRS)
 	    -v ${PWD}:/src                                          \
 	    -w /src                                                 \
 	    -v ${PWD}/.go:/go										\
-	    -v ${PWD}/.go/.cache:/.cache                            \
+	    -v ${PWD}/.cache:/.cache                                \
 	    --env HTTP_PROXY=$(HTTP_PROXY)                          \
 	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
-	    $(TEST_IMAGE)                                          \
+	    $(TEST_IMAGE)                                           \
 	    /bin/sh -c "                                            \
 	        ARCH=$(ARCH)                                        \
 	        OS=$(OS)                                            \
@@ -253,4 +253,4 @@ container-clean:
 	rm -rf .container-* .dockerfile-* .push-*
 
 bin-clean:
-	rm -rf .go bin
+	rm -rf .go .cache bin
