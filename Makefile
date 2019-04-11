@@ -58,9 +58,9 @@ BUILD_BIN_DIR := ${PWD}/bin
 
 # Directories that we need created to build/test.
 BUILD_DIRS := ${PWD}/.go/pkg				\
-              ${PWD}/.cache				    \
+			  ${PWD}/.cache				    \
 			  ${PWD}/bin/$(OS)_$(ARCH)      \
-              #.go/bin/$(OS)_$(ARCH)
+			  #.go/bin/$(OS)_$(ARCH)
 $(BUILD_DIRS):
 	@mkdir -p $@
 
@@ -78,21 +78,21 @@ all: build
 
 build-%:
 	@$(MAKE) build                        \
-	    --no-print-directory              \
-	    GOOS=$(firstword $(subst _, ,$*)) \
-	    GOARCH=$(lastword $(subst _, ,$*))
+		--no-print-directory              \
+		GOOS=$(firstword $(subst _, ,$*)) \
+		GOARCH=$(lastword $(subst _, ,$*))
 
 container-%:
 	@$(MAKE) container                    \
-	    --no-print-directory              \
-	    GOOS=$(firstword $(subst _, ,$*)) \
-	    GOARCH=$(lastword $(subst _, ,$*))
+		--no-print-directory              \
+		GOOS=$(firstword $(subst _, ,$*)) \
+		GOARCH=$(lastword $(subst _, ,$*))
 
 push-%:
 	@$(MAKE) push                         \
-	    --no-print-directory              \
-	    GOOS=$(firstword $(subst _, ,$*)) \
-	    GOARCH=$(lastword $(subst _, ,$*))
+		--no-print-directory              \
+		GOOS=$(firstword $(subst _, ,$*)) \
+		GOARCH=$(lastword $(subst _, ,$*))
 
 all-build: $(addprefix build-, $(subst /,_, $(ALL_PLATFORMS)))
 
@@ -141,45 +141,45 @@ build: $(OUTBIN)
 $(OUTBIN): $(BUILD_DIRS)
 	@echo "making $(OUTBIN)"
 	@docker run                                                 \
-	    -i                                                      \
-	    --rm                                                    \
-	    -u $$(id -u):$$(id -g)                                  \
-	    -v ${PWD}:/src                                          \
-	    -w /src                                                 \
-	    -v ${PWD}/.go:/go										\
-	    -v ${PWD}/.cache:/.cache						    	\
-	    --env HTTP_PROXY=$(HTTP_PROXY)                          \
-	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
-	    $(BUILD_IMAGE)                                          \
-	    /bin/sh -c "                                            \
+		-i                                                      \
+		--rm                                                    \
+		-u $$(id -u):$$(id -g)                                  \
+		-v ${PWD}:/src                                          \
+		-w /src                                                 \
+		-v ${PWD}/.go:/go										\
+		-v ${PWD}/.cache:/.cache						    	\
+		--env HTTP_PROXY=$(HTTP_PROXY)                          \
+		--env HTTPS_PROXY=$(HTTPS_PROXY)                        \
+		$(BUILD_IMAGE)                                          \
+		/bin/sh -c "                                            \
 			OUTBIN=$(OUTBIN)									\
-	        ARCH=$(ARCH)                                        \
-	        OS=$(OS)                                            \
-	        VERSION=$(VERSION)                                  \
-	        COMMIT_SHA1=$(shell git rev-parse HEAD)             \
+			ARCH=$(ARCH)                                        \
+			OS=$(OS)                                            \
+			VERSION=$(VERSION)                                  \
+			COMMIT_SHA1=$(shell git rev-parse HEAD)             \
 			BUILD_DATE=$(shell date '+%Y-%m-%dT%H:%M:%S%z')		\
-	        ./build/build.sh                                    \
-	    ";
+			./build/build.sh                                    \
+		";
 #	@if ! cmp -s .go/$(OUTBIN) $(OUTBIN); then \
-	    mv .go/$(OUTBIN) $(OUTBIN);            \
-	    date >$@;                              \
+		mv .go/$(OUTBIN) $(OUTBIN);            \
+		date >$@;                              \
 	fi
 
 # Example: make shell CMD="-c 'date > datefile'"
 shell: $(BUILD_DIRS)
 	@echo "launching a shell in the containerized build environment"
 	@docker run                                                 \
-	    -ti                                                     \
-	    --rm                                                    \
-	    -u $$(id -u):$$(id -g)                                  \
-	    -v ${PWD}:/src                                          \
-	    -w /src                                                 \
-	    -v ${PWD}/.go:/go										\
-	    -v ${PWD}/.cache:/.cache						    	\
-	    --env HTTP_PROXY=$(HTTP_PROXY)                          \
-	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
-	    $(BUILD_IMAGE)                                          \
-	    /bin/sh $(CMD)
+		-ti                                                     \
+		--rm                                                    \
+		-u $$(id -u):$$(id -g)                                  \
+		-v ${PWD}:/src                                          \
+		-w /src                                                 \
+		-v ${PWD}/.go:/go										\
+		-v ${PWD}/.cache:/.cache						    	\
+		--env HTTP_PROXY=$(HTTP_PROXY)                          \
+		--env HTTPS_PROXY=$(HTTPS_PROXY)                        \
+		$(BUILD_IMAGE)                                          \
+		/bin/sh $(CMD)
 
 # Used to track state in hidden files.
 DOTFILE_IMAGE = $(subst /,_,$(IMAGE))-$(TAG)
@@ -187,11 +187,11 @@ DOTFILE_IMAGE = $(subst /,_,$(IMAGE))-$(TAG)
 container: .container-$(DOTFILE_IMAGE) say_container_name
 .container-$(DOTFILE_IMAGE): bin/$(OS)_$(ARCH)/$(BIN) Dockerfile.in
 	@sed                                 \
-	    -e 's|{ARG_BIN}|$(BIN)|g'        \
-	    -e 's|{ARG_ARCH}|$(ARCH)|g'      \
-	    -e 's|{ARG_OS}|$(OS)|g'          \
-	    -e 's|{ARG_FROM}|$(BASEIMAGE)|g' \
-	    Dockerfile.in > .dockerfile-$(OS)_$(ARCH)
+		-e 's|{ARG_BIN}|$(BIN)|g'        \
+		-e 's|{ARG_ARCH}|$(ARCH)|g'      \
+		-e 's|{ARG_OS}|$(OS)|g'          \
+		-e 's|{ARG_FROM}|$(BASEIMAGE)|g' \
+		Dockerfile.in > .dockerfile-$(OS)_$(ARCH)
 	@docker build -t $(IMAGE):$(TAG) -f .dockerfile-$(OS)_$(ARCH) .
 	@docker images -q $(IMAGE):$(TAG) > $@
 
@@ -208,34 +208,34 @@ say_push_name:
 manifest-list: push
 	platforms=$$(echo $(ALL_PLATFORMS) | sed 's/ /,/g');  \
 	manifest-tool                                         \
-	    --username=oauth2accesstoken                      \
-	    --password=$$(gcloud auth print-access-token)     \
-	    push from-args                                    \
-	    --platforms "$$platforms"                         \
-	    --template $(REGISTRY)/$(BIN):$(VERSION)__OS_ARCH \
-	    --target $(REGISTRY)/$(BIN):$(VERSION)
+		--username=oauth2accesstoken                      \
+		--password=$$(gcloud auth print-access-token)     \
+		push from-args                                    \
+		--platforms "$$platforms"                         \
+		--template $(REGISTRY)/$(BIN):$(VERSION)__OS_ARCH \
+		--target $(REGISTRY)/$(BIN):$(VERSION)
 
 version:
 	@echo $(VERSION)
 
 test: $(BUILD_DIRS)
 	@docker run                                                 \
-	    -i                                                      \
-	    --rm                                                    \
-	    -u $$(id -u):$$(id -g)                                  \
-	    -v ${PWD}:/src                                          \
-	    -w /src                                                 \
-	    -v ${PWD}/.go:/go										\
-	    -v ${PWD}/.cache:/.cache                                \
-	    --env HTTP_PROXY=$(HTTP_PROXY)                          \
-	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
-	    $(TEST_IMAGE)                                           \
-	    /bin/sh -c "                                            \
-	        ARCH=$(ARCH)                                        \
-	        OS=$(OS)                                            \
-	        VERSION=$(VERSION)                                  \
-	        ./build/test.sh $(SRC_DIRS)                         \
-	    "
+		-i                                                      \
+		--rm                                                    \
+		-u $$(id -u):$$(id -g)                                  \
+		-v ${PWD}:/src                                          \
+		-w /src                                                 \
+		-v ${PWD}/.go:/go										\
+		-v ${PWD}/.cache:/.cache                                \
+		--env HTTP_PROXY=$(HTTP_PROXY)                          \
+		--env HTTPS_PROXY=$(HTTPS_PROXY)                        \
+		$(TEST_IMAGE)                                           \
+		/bin/sh -c "                                            \
+			ARCH=$(ARCH)                                        \
+			OS=$(OS)                                            \
+			VERSION=$(VERSION)                                  \
+			./build/test.sh $(SRC_DIRS)                         \
+		"
 
 # Development docker-compose up. Run build first
 up:
