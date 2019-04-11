@@ -66,6 +66,8 @@ $(BUILD_DIRS):
 
 OUTBIN = bin/$(OS)_$(ARCH)/$(BIN)
 
+$(shell mkdir -p $(BUILD_DIRS))
+
 # If you want to build all binaries, see the 'all-build' rule.
 # If you want to build all containers, see the 'all-container' rule.
 # If you want to build AND push all containers, see the 'all-push' rule.
