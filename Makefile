@@ -240,11 +240,11 @@ test: $(BUILD_DIRS)
 # Development docker-compose up. Run build first
 up:
 	@$(MAKE) build
-	@docker-compose -f docker-compose.dev.yml up
+	@UID=$$(id -u) GID=$$(id -g) docker-compose -f docker-compose.dev.yml up
 
 # Development docker-compose down
 down:
-	@docker-compose -f docker-compose.dev.yml down
+	@@UID=$$(id -u) GID=$$(id -g) docker-compose -f docker-compose.dev.yml down
 
 
 clean: container-clean bin-clean
