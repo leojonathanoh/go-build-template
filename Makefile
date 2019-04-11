@@ -218,6 +218,11 @@ manifest-list: push
 version:
 	@echo $(VERSION)
 
+DEBUG_DOCKER_COMPOSE_YML := docker-compose.debug.yml
+DEBUG_DOCKERFILE := ./debug/dlv.Dockerfile
+debug: $(DEBUG_DOCKER_COMPOSE_YML) $(DEBUG_DOCKERFILE)
+	@UID=$$(id -u) GID=$$(id -g) docker-compose -f docker-compose.debug.yml up --build
+
 test: $(BUILD_DIRS)
 	@docker run                                                 \
 		-i                                                      \

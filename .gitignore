@@ -4,3 +4,6 @@
 /.push-*
 /.container-*
 /.dockerfile-*
+
+# Delve config
+/.config/dlv

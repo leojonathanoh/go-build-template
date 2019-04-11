@@ -51,3 +51,11 @@ Run `make clean` to clean up.
 Run `make up` to start the dockerized application
 
 Run `make down` to stop the dockerized application
+
+## Debug application
+
+Run `make debug` to start the dockerized application under debug mode
+
+Point your debugger to `127.0.0.1:2345` to start debugging
+
+Press `Ctrl+C` on the terminal to stop debugging
