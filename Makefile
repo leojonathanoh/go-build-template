@@ -243,12 +243,13 @@ test: $(BUILD_DIRS)
 		"
 
 # Development docker-compose up. Run build first
-up:
+DEV_DOCKER_COMPOSE_YML := docker-compose.debug.yml
+up: $(DEV_DOCKER_COMPOSE_YML)
 	@$(MAKE) build
 	@UID=$$(id -u) GID=$$(id -g) docker-compose -f docker-compose.dev.yml up
 
 # Development docker-compose down
-down:
+down: $(DEV_DOCKER_COMPOSE_YML)
 	@@UID=$$(id -u) GID=$$(id -g) docker-compose -f docker-compose.dev.yml down
 
 
