@@ -44,6 +44,7 @@ IMAGE := $(REGISTRY)/$(BIN)
 TAG := $(VERSION)__$(OS)_$(ARCH)
 
 BUILD_IMAGE ?= golang:1.12-alpine
+SHELL_IMAGE ?= golang:1.12
 
 PWD := $$PWD
 
@@ -156,7 +157,7 @@ shell: $(BUILD_DIRS)
 		-v $(BUILD_GOCACHE):/.cache						    	\
 		--env HTTP_PROXY=$(HTTP_PROXY)                          \
 		--env HTTPS_PROXY=$(HTTPS_PROXY)                        \
-		$(BUILD_IMAGE)                                          \
+		$(SHELL_IMAGE)                                          \
 		/bin/sh $(CMD)
 
 # Used to track state in hidden files.
