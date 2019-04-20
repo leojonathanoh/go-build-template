@@ -44,7 +44,6 @@ IMAGE := $(REGISTRY)/$(BIN)
 TAG := $(VERSION)__$(OS)_$(ARCH)
 
 BUILD_IMAGE ?= golang:1.12
-TEST_IMAGE ?= golang:1.12-alpine
 
 PWD := $$PWD
 
@@ -211,7 +210,7 @@ test: $(BUILD_DIRS)
 		-v $(BUILD_GOCACHE):/.cache                             \
 		--env HTTP_PROXY=$(HTTP_PROXY)                          \
 		--env HTTPS_PROXY=$(HTTPS_PROXY)                        \
-		$(TEST_IMAGE)                                           \
+		$(BUILD_IMAGE)                                           \
 		/bin/sh -c "                                            \
 			ARCH=$(ARCH)                                        \
 			OS=$(OS)                                            \
