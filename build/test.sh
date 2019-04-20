@@ -20,7 +20,9 @@ set -o pipefail
 
 export CGO_ENABLED=0
 export GO111MODULE=on
-#export GOFLAGS="-mod=vendor"
+if [ -d vendor ]; then
+    export GOFLAGS="-mod=vendor"
+fi
 
 TARGETS=$(go list ./... | grep -v /vendor/)
 
