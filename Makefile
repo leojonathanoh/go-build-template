@@ -202,6 +202,7 @@ DEBUG_DOCKERFILE := ./debug/dlv.Dockerfile
 debug: $(DEBUG_DOCKER_COMPOSE_YML) $(DEBUG_DOCKERFILE)
 	@UID=$$(id -u) GID=$$(id -g) docker-compose -f docker-compose.debug.yml up --build
 
+# We replace .go and .cache with empty directories in the container
 test: $(BUILD_DIRS)
 	@docker run                                                 \
 		-i                                                      \
@@ -209,6 +210,8 @@ test: $(BUILD_DIRS)
 		-u $$(id -u):$$(id -g)                                  \
 		-v $(PWD):$(PWD)                                          \
 		-w $(PWD)                                                 \
+		-v $(BUILD_GOPATH)                                      \
+		-v $(BUILD_GOCACHE)                                     \
 		-v $(BUILD_GOPATH):/go									\
 		-v $(BUILD_GOCACHE):/.cache                             \
 		--env HTTP_PROXY=$(HTTP_PROXY)                          \
