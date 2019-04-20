@@ -48,13 +48,15 @@ TEST_IMAGE ?= golang:1.12-alpine
 
 PWD = $$(pwd)
 
-# Directory to mount ramdisk on
+# Build directories
+BUILD_GOPATH := ${PWD}/.go
+BUILD_GOCACHE := ${PWD}/.cache
 BUILD_BIN_DIR := ${PWD}/bin
 
 # Directories that we need created to build/test.
-BUILD_DIRS := ${PWD}/.go/pkg				\
-			  ${PWD}/.cache				    \
-			  ${PWD}/bin/$(OS)_$(ARCH)      \
+BUILD_DIRS := $(BUILD_GOPATH)				\
+			  $(BUILD_GOCACHE)			    \
+			  $(BUILD_BIN_DIR)     			\
 			  #.go/bin/$(OS)_$(ARCH)
 $(BUILD_DIRS):
 	@mkdir -p $@
@@ -123,8 +125,8 @@ $(OUTBIN): $(BUILD_DIRS)
 		-u $$(id -u):$$(id -g)                                  \
 		-v ${PWD}:/src                                          \
 		-w /src                                                 \
-		-v ${PWD}/.go:/go										\
-		-v ${PWD}/.cache:/.cache						    	\
+		-v $(BUILD_GOPATH):/go									\
+		-v $(BUILD_GOCACHE):/.cache						    	\
 		--env HTTP_PROXY=$(HTTP_PROXY)                          \
 		--env HTTPS_PROXY=$(HTTPS_PROXY)                        \
 		$(BUILD_IMAGE)                                          \
@@ -151,8 +153,8 @@ shell: $(BUILD_DIRS)
 		-u $$(id -u):$$(id -g)                                  \
 		-v ${PWD}:/src                                          \
 		-w /src                                                 \
-		-v ${PWD}/.go:/go										\
-		-v ${PWD}/.cache:/.cache						    	\
+		-v $(BUILD_GOPATH):/go										\
+		-v $(BUILD_GOCACHE):/.cache						    	\
 		--env HTTP_PROXY=$(HTTP_PROXY)                          \
 		--env HTTPS_PROXY=$(HTTPS_PROXY)                        \
 		$(BUILD_IMAGE)                                          \
@@ -207,8 +209,8 @@ test: $(BUILD_DIRS)
 		-u $$(id -u):$$(id -g)                                  \
 		-v ${PWD}:/src                                          \
 		-w /src                                                 \
-		-v ${PWD}/.go:/go										\
-		-v ${PWD}/.cache:/.cache                                \
+		-v $(BUILD_GOPATH):/go									\
+		-v $(BUILD_GOCACHE):/.cache                             \
 		--env HTTP_PROXY=$(HTTP_PROXY)                          \
 		--env HTTPS_PROXY=$(HTTPS_PROXY)                        \
 		$(TEST_IMAGE)                                           \
@@ -236,4 +238,5 @@ container-clean:
 	rm -rf .container-* .dockerfile-* .push-*
 
 bin-clean:
-	rm -rf .go .cache bin
+	rm -rf $(BUILD_GOPATH) $(BUILD_GOCACHE) $(BUILD_BIN_DIR)
+
