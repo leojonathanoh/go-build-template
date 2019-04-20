@@ -46,12 +46,12 @@ TAG := $(VERSION)__$(OS)_$(ARCH)
 BUILD_IMAGE ?= golang:1.12
 TEST_IMAGE ?= golang:1.12-alpine
 
-PWD = $$(pwd)
+PWD := $$PWD
 
 # Build directories
-BUILD_GOPATH := ${PWD}/.go
-BUILD_GOCACHE := ${PWD}/.cache
-BUILD_BIN_DIR := ${PWD}/bin
+BUILD_GOPATH := $(PWD)/.go
+BUILD_GOCACHE := $(PWD)/.cache
+BUILD_BIN_DIR := $(PWD)/bin
 
 # Directories that we need created to build/test.
 BUILD_DIRS := $(BUILD_GOPATH)				\
@@ -123,7 +123,7 @@ $(OUTBIN): $(BUILD_DIRS)
 		-i                                                      \
 		--rm                                                    \
 		-u $$(id -u):$$(id -g)                                  \
-		-v ${PWD}:/src                                          \
+		-v $(PWD):/src                                          \
 		-w /src                                                 \
 		-v $(BUILD_GOPATH):/go									\
 		-v $(BUILD_GOCACHE):/.cache						    	\
@@ -151,7 +151,7 @@ shell: $(BUILD_DIRS)
 		-ti                                                     \
 		--rm                                                    \
 		-u $$(id -u):$$(id -g)                                  \
-		-v ${PWD}:/src                                          \
+		-v $(PWD):/src                                          \
 		-w /src                                                 \
 		-v $(BUILD_GOPATH):/go										\
 		-v $(BUILD_GOCACHE):/.cache						    	\
@@ -207,7 +207,7 @@ test: $(BUILD_DIRS)
 		-i                                                      \
 		--rm                                                    \
 		-u $$(id -u):$$(id -g)                                  \
-		-v ${PWD}:/src                                          \
+		-v $(PWD):/src                                          \
 		-w /src                                                 \
 		-v $(BUILD_GOPATH):/go									\
 		-v $(BUILD_GOCACHE):/.cache                             \
