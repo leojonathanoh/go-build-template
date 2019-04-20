@@ -136,7 +136,7 @@ $(OUTBIN): $(BUILD_DIRS)
 			OS=$(OS)                                            \
 			VERSION=$(VERSION)                                  \
 			COMMIT_SHA1=$(shell git rev-parse HEAD)             \
-			BUILD_DATE=$(shell date '+%Y-%m-%dT%H:%M:%S%z')		\
+			BUILD_DATE=$(shell date -u '+%Y-%m-%dT%H:%M:%S%z')	\
 			./build/build.sh                                    \
 		";
 #	@if ! cmp -s .go/$(OUTBIN) $(OUTBIN); then \
