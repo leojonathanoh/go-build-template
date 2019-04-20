@@ -223,11 +223,11 @@ test: $(BUILD_DIRS)
 DEV_DOCKER_COMPOSE_YML := docker-compose.dev.yml
 up: $(DEV_DOCKER_COMPOSE_YML)
 	@$(MAKE) build
-	@UID=$$(id -u) GID=$$(id -g) docker-compose -f docker-compose.dev.yml up
+	@OUTBIN=$(OUTBIN) BIN=$(BIN) UID=$$(id -u) GID=$$(id -g) docker-compose -f $(DEV_DOCKER_COMPOSE_YML) up
 
 # Development docker-compose down
 down: $(DEV_DOCKER_COMPOSE_YML)
-	@UID=$$(id -u) GID=$$(id -g) docker-compose -f docker-compose.dev.yml down
+	@OUTBIN=$(OUTBIN) BIN=$(BIN) UID=$$(id -u) GID=$$(id -g) docker-compose -f $(DEV_DOCKER_COMPOSE_YML) down
 
 
 clean: container-clean bin-clean
