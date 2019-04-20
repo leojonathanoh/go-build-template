@@ -14,8 +14,6 @@
 
 # The binary to build (just the basename).
 BIN := myapp
-GOOS = linux
-GOARCH = amd64
 
 # Where to push the docker image.
 REGISTRY ?= thockin
