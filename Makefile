@@ -123,8 +123,8 @@ $(OUTBIN): $(BUILD_DIRS)
 		-i                                                      \
 		--rm                                                    \
 		-u $$(id -u):$$(id -g)                                  \
-		-v $(PWD):/src                                          \
-		-w /src                                                 \
+		-v $(PWD):$(PWD)                                          \
+		-w $(PWD)                                                 \
 		-v $(BUILD_GOPATH):/go									\
 		-v $(BUILD_GOCACHE):/.cache						    	\
 		--env HTTP_PROXY=$(HTTP_PROXY)                          \
@@ -151,8 +151,8 @@ shell: $(BUILD_DIRS)
 		-ti                                                     \
 		--rm                                                    \
 		-u $$(id -u):$$(id -g)                                  \
-		-v $(PWD):/src                                          \
-		-w /src                                                 \
+		-v $(PWD):$(PWD)                                          \
+		-w $(PWD)                                                 \
 		-v $(BUILD_GOPATH):/go										\
 		-v $(BUILD_GOCACHE):/.cache						    	\
 		--env HTTP_PROXY=$(HTTP_PROXY)                          \
@@ -207,8 +207,8 @@ test: $(BUILD_DIRS)
 		-i                                                      \
 		--rm                                                    \
 		-u $$(id -u):$$(id -g)                                  \
-		-v $(PWD):/src                                          \
-		-w /src                                                 \
+		-v $(PWD):$(PWD)                                          \
+		-w $(PWD)                                                 \
 		-v $(BUILD_GOPATH):/go									\
 		-v $(BUILD_GOCACHE):/.cache                             \
 		--env HTTP_PROXY=$(HTTP_PROXY)                          \
