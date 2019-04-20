@@ -236,5 +236,4 @@ container-clean:
 	rm -rf .container-* .dockerfile-* .push-*
 
 bin-clean:
-	chmod -R +w .go .cache bin
 	rm -rf .go .cache bin
