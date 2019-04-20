@@ -131,6 +131,7 @@ $(OUTBIN): $(BUILD_DIRS)
 		--env HTTPS_PROXY=$(HTTPS_PROXY)                        \
 		$(BUILD_IMAGE)                                          \
 		/bin/sh -c "                                            \
+			INSTALL_GIT=$(INSTALL_GIT)							\
 			OUTBIN=$(OUTBIN)									\
 			ARCH=$(ARCH)                                        \
 			OS=$(OS)                                            \
@@ -211,8 +212,9 @@ test: $(BUILD_DIRS)
 		-v $(BUILD_GOCACHE):/.cache                             \
 		--env HTTP_PROXY=$(HTTP_PROXY)                          \
 		--env HTTPS_PROXY=$(HTTPS_PROXY)                        \
-		$(BUILD_IMAGE)                                           \
+		$(BUILD_IMAGE)                                          \
 		/bin/sh -c "                                            \
+			INSTALL_GIT=$(INSTALL_GIT)							\
 			ARCH=$(ARCH)                                        \
 			OS=$(OS)                                            \
 			VERSION=$(VERSION)                                  \

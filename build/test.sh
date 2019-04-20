@@ -24,6 +24,11 @@ if [ -d vendor ]; then
     export GOFLAGS="-mod=vendor"
 fi
 
+# Install git if specified
+if [ -n "$INSTALL_GIT" ]; then
+    apk add --no-cache git
+fi
+
 TARGETS=$(go list ./... | grep -v /vendor/)
 
 echo "Running tests:"
