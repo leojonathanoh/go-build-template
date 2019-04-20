@@ -236,5 +236,6 @@ container-clean:
 	rm -rf .container-* .dockerfile-* .push-*
 
 bin-clean:
+	chmod -R +w $(BUILD_GOPATH) $(BUILD_GOCACHE) $(BUILD_BIN_DIR)
 	rm -rf $(BUILD_GOPATH) $(BUILD_GOCACHE) $(BUILD_BIN_DIR)
 
