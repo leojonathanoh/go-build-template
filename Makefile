@@ -50,7 +50,7 @@ PWD := $$PWD
 
 # Build directories
 BUILD_GOPATH := $(PWD)/.go
-BUILD_GOCACHE := $(PWD)/.cache
+BUILD_GOCACHE := $(PWD)/.cache/go-build
 BUILD_BIN_DIR := $(PWD)/bin
 
 # Directories that we need created to build/test.
@@ -126,7 +126,7 @@ $(OUTBIN): $(BUILD_DIRS)
 		-v $(PWD):$(PWD)                                          \
 		-w $(PWD)                                                 \
 		-v $(BUILD_GOPATH):/go									\
-		-v $(BUILD_GOCACHE):/.cache						    	\
+		-v $(BUILD_GOCACHE):/.cache/go-build					\
 		--env HTTP_PROXY=$(HTTP_PROXY)                          \
 		--env HTTPS_PROXY=$(HTTPS_PROXY)                        \
 		$(BUILD_IMAGE)                                          \
@@ -155,7 +155,7 @@ shell: $(BUILD_DIRS)
 		-v $(PWD):$(PWD)                                          \
 		-w $(PWD)                                                 \
 		-v $(BUILD_GOPATH):/go										\
-		-v $(BUILD_GOCACHE):/.cache						    	\
+		-v $(BUILD_GOCACHE):/.cache/go-build					\
 		--env HTTP_PROXY=$(HTTP_PROXY)                          \
 		--env HTTPS_PROXY=$(HTTPS_PROXY)                        \
 		$(SHELL_IMAGE)                                          \
@@ -209,7 +209,7 @@ test: $(BUILD_DIRS)
 		-v $(BUILD_GOPATH)                                      \
 		-v $(BUILD_GOCACHE)                                     \
 		-v $(BUILD_GOPATH):/go									\
-		-v $(BUILD_GOCACHE):/.cache                             \
+		-v $(BUILD_GOCACHE):/.cache/go-build                    \
 		--env HTTP_PROXY=$(HTTP_PROXY)                          \
 		--env HTTPS_PROXY=$(HTTPS_PROXY)                        \
 		$(BUILD_IMAGE)                                          \
