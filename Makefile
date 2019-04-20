@@ -43,7 +43,7 @@ BASEIMAGE ?= gcr.io/distroless/static
 IMAGE := $(REGISTRY)/$(BIN)
 TAG := $(VERSION)__$(OS)_$(ARCH)
 
-BUILD_IMAGE ?= golang:1.12
+BUILD_IMAGE ?= golang:1.12-alpine
 
 PWD := $$PWD
 
