@@ -51,9 +51,6 @@ PWD = $$(pwd)
 # Directory to mount ramdisk on
 BUILD_BIN_DIR := ${PWD}/bin
 
-# $GOPATH/src to download dependencies into
-# BUILD_SRC_DIR := .go/src
-
 # Directories that we need created to build/test.
 BUILD_DIRS := ${PWD}/.go/pkg				\
 			  ${PWD}/.cache				    \
@@ -106,24 +103,6 @@ mount-ramdisk:
 # Unmounts a ramdisk on ./go/bin
 unmount-ramdisk:
 	@mount | grep $(BUILD_BIN_DIR) && sudo umount $(BUILD_BIN_DIR) && echo "unmount $(BUILD_BIN_DIR)" || echo "nothing to unmount on $(BUILD_BIN_DIR)"
-
-# Deprecated: This will download dependencies ./.go/src
-# get: $(BUILD_SRC_DIR)
-# 	@mkdir -p $(BUILD_SRC_DIR)
-# 	@echo "running go get"
-# 	@docker run                                                 \
-# 	    -i                                                      \
-# 	    --rm                                                    \
-# 	    -u $$(id -u):$$(id -g)                                  \
-# 	    -v ${PWD}/.go/src:/go/src               				\
-# 	    -v ${PWD}:/go/src/app                                   \
-# 	    -w /go/src/app                                          \
-# 	    --env HTTP_PROXY=$(HTTP_PROXY)                          \
-# 	    --env HTTPS_PROXY=$(HTTPS_PROXY)                        \
-# 	    $(BUILD_IMAGE)                                          \
-# 	    /bin/sh -c "                                            \
-# 			go get -d -v ./...                                  \
-# 	    "
 
 build: $(OUTBIN)
 
