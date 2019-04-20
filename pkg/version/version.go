@@ -16,6 +16,23 @@ limitations under the License.
 
 package version
 
+import (
+	"fmt"
+	"runtime"
+)
+
 // VERSION is the app-global version string, which should be substituted with a
 // real value during build.
 var VERSION = "UNKNOWN"
+
+// BUILD_DATE is the app-global version string, which should be substituted with a
+// real value during build.
+var BUILD_DATE = "UNKNOWN"
+
+// COMMIT_SHA1 is the app-global version string, which should be substituted with a
+// real value during build.
+var COMMIT_SHA1 = "UNKNOWN"
+
+func GetVersion() string {
+	return fmt.Sprintf("Version: %s, Build date: %s, Commit SHA: %s, Go version: %s", VERSION, BUILD_DATE, COMMIT_SHA1, runtime.Version())
+}
